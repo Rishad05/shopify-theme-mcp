@@ -1,13 +1,14 @@
 /* ============================================================================
-   custom.css — "Precision" dark design layer
+   custom.css — "Organic Market" design layer
    ----------------------------------------------------------------------------
    Loaded after color-palette.liquid so it can override the theme's token layer.
-   No Horizon file is modified beyond the one render line that loads this, so
-   theme updates continue to apply cleanly.
+   Horizon's own files are untouched apart from the one render line that loads
+   this, so theme updates continue to apply cleanly.
 
    Colour, type, radii and button styling live in theme settings (Theme editor →
-   Settings). This file covers what settings can't reach: the elevation ladder,
-   dark-specific contrast fixes, motion, and a handful of component refinements.
+   Settings). This file covers what settings can't reach: the sage surface
+   scale, card composition, and the accents the reference design uses that
+   Horizon has no field for.
    ========================================================================== */
 
 /* ----------------------------------------------------------------------------
@@ -15,87 +16,79 @@
    -------------------------------------------------------------------------- */
 
 :root {
-  /* Elevation ladder. The page ground is #0A0A0B. Each step up adds light
-     rather than a shadow — on a near-black ground a shadow reads as mud, so
-     depth has to come from the surface getting brighter. */
-  --surface-1: #101014; /* cards, inputs, popovers */
-  --surface-2: #17171d; /* hover / active state of the above */
-  --surface-3: #1e1e25; /* pressed, or a third nested level */
+  /* Sage surface scale — the tinted section grounds in the reference: the hero
+     wash, the promo cards, the "locally sourced" band. Defined as tokens so a
+     section can pick one up by class instead of a merchant colour-matching by
+     hand in the editor. */
+  --sage-50: #f4f7ef;
+  --sage-100: #e9efdf;
+  --sage-200: #dce6cb;
+  --sage-600: #6d8a4a;
+  --sage-900: #2f4420;
 
-  /* Hairlines are the foreground at low alpha, not a fixed grey, so they stay
-     correct if the ground colour is ever retuned in settings. */
+  /* The warm neutrals that sit beside the greens: the cream "Finest Bread" card
+     and the pale blue "Pure Organic" card. */
+  --cream-100: #f1ebdd;
+  --clay-100: #efe4d8;
+  --sky-100: #dfe8ee;
+
+  /* Product-image ground. Packshots in the reference sit on a warm off-white,
+     never pure white, so the card reads as a surface rather than a cutout. */
+  --media-ground: #f6f6f3;
+
+  /* Hairlines as foreground-at-alpha rather than a fixed grey, so they stay
+     correct if the palette is retuned in settings. */
   --hairline: rgb(var(--color-foreground-rgb) / 0.1);
   --hairline-strong: rgb(var(--color-foreground-rgb) / 0.18);
 
-  /* Monospace label face. System stack — zero bytes, paints immediately, and
-     every target platform ships a good one. */
-  --font-mono: ui-monospace, SFMono-Regular, 'SF Mono', 'Roboto Mono', Menlo, Consolas, monospace;
+  /* Serif accent for the marquee's italic words ("New store in New York").
+     A system stack — no extra webfont request. Applied via .serif-accent. */
+  --font-serif: 'Iowan Old Style', 'Palatino Linotype', Palatino, Georgia, 'Times New Roman', serif;
 
-  /* Radii: mechanical rather than pillowy. Horizon's sm/md/lg are used by
-     drawers, menus and media wrappers that settings don't expose. */
-  --style-border-radius-xs: 4px;
-  --style-border-radius-sm: 8px;
-  --style-border-radius-md: 10px;
-  --style-border-radius-lg: 14px;
+  /* Radii: generous and friendly, matching the pill buttons set in settings. */
+  --style-border-radius-xs: 6px;
+  --style-border-radius-sm: 12px;
+  --style-border-radius-md: 16px;
+  --style-border-radius-lg: 24px;
 
-  /* Shadows: deep, wide and low-opacity, always paired with a hairline so the
-     edge stays legible where the shadow alone can't carry it. */
-  --shadow-button: 0 1px 2px rgb(0 0 0 / 0.5);
-  --shadow-popover: 0 20px 48px -16px rgb(0 0 0 / 0.8), 0 0 0 1px var(--hairline);
-  --shadow-drawer: 0 24px 64px -20px rgb(0 0 0 / 0.85);
-  --shadow-card-hover: 0 20px 44px -20px rgb(0 0 0 / 0.9);
+  /* Shadows on a white ground are soft and wide, never dark — the reference
+     separates cards with tint and hairline first, shadow only on hover. */
+  --shadow-button: 0 1px 2px rgb(27 32 24 / 0.08);
+  --shadow-popover: 0 12px 32px -8px rgb(27 32 24 / 0.14), 0 0 0 1px var(--hairline);
+  --shadow-drawer: 0 16px 48px -12px rgb(27 32 24 / 0.18);
+  --shadow-card-hover: 0 14px 32px -12px rgb(27 32 24 / 0.16);
 
   /* theme-styles-variables.liquid and base.css both set
      `--backdrop-color-rgb: var(--color-shadow-rgb)`, but --color-shadow-rgb is
-     never defined anywhere in the theme. That leaves the dialog and drawer
+     never defined anywhere in Horizon. That leaves the dialog and drawer
      backdrops resolving to an invalid colour, so they render fully transparent.
-     Defining it here restores the scrim behind modals and the cart drawer. */
-  --color-shadow-rgb: 0 0 0;
+     Defining it restores the scrim behind modals and the cart drawer. */
+  --color-shadow-rgb: 27 32 24;
 
-  /* Motion: fewer moves, slower, more deliberate. Horizon's 0.125s default
-     reads as snap on white and as flicker on dark. */
-  --hover-transition-duration: 0.3s;
+  /* Motion: unhurried, matching the softer visual language. */
+  --hover-transition-duration: 0.28s;
   --hover-transition-timing: cubic-bezier(0.22, 1, 0.36, 1);
   --animation-speed: 0.18s;
   --animation-speed-medium: 0.22s;
   --animation-speed-slow: 0.3s;
+  --hover-lift-amount: 5px;
 
-  /* Card lift travels a little further to match the slower easing. */
-  --hover-lift-amount: 6px;
+  /* Status colours, tuned to the palette rather than Horizon's stock primaries. */
+  --color-error: #c0392b;
+  --color-success: #4c7a34;
+  --color-instock: #5b9134;
+  --color-lowstock: #d98324;
+  --color-outofstock: #b4b9ab;
 
-  /* Status colours. Horizon ships --color-error #8B0000 and --color-success
-     #006400, both of which are effectively invisible on a near-black ground. */
-  --color-error: #ff7070;
-  --color-success: #4ade80;
-  --color-instock: #4ade80;
-  --color-lowstock: #fbbf24;
-  --color-outofstock: #5c5c66;
-
-  /* Focus ring. The 1.5px default disappears against dark; 2px at a wider
-     offset stays obvious without looking like a border. */
-  --focus-outline-width: 2px;
-  --focus-outline-offset: 3px;
-
-  /* Badge chip padding, flattened across breakpoints — the stock values step up
-     at 750px, which makes a 12px mono label look loose on desktop. */
+  /* Badge chip padding, flattened across breakpoints so the small uppercase
+     label keeps the same proportions on mobile and desktop. */
   --badge-rectangle-padding-block: 3px;
   --badge-rectangle-padding-inline: 8px;
-
-  /* Media overlay. Product photography is usually lighter than the page, so
-     white type over it needs a heavier foot than the stock 0.5 ramp. */
-  --gradient-image-overlay: linear-gradient(to top, rgb(0 0 0 / 0.75), rgb(0 0 0 / 0.2) 45%, transparent);
 }
 
 /* ----------------------------------------------------------------------------
    2. Base
    -------------------------------------------------------------------------- */
-
-/* Subpixel antialiasing thickens light-on-dark text and gives it a coloured
-   fringe. Greyscale AA is the single biggest legibility win on a dark theme. */
-body {
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
-}
 
 /* Digits in prices sit in fixed-width columns so grids don't jitter as values
    change and totals line up in the cart. */
@@ -105,48 +98,120 @@ body {
 }
 
 ::selection {
-  background-color: var(--color-foreground);
-  color: var(--color-background);
-}
-
-html,
-.page-wrapper {
-  scrollbar-color: rgb(var(--color-foreground-rgb) / 0.22) transparent;
+  background-color: var(--sage-200);
+  color: var(--sage-900);
 }
 
 /* ----------------------------------------------------------------------------
-   3. Mono label utility
+   3. Accent utilities
 
-   The eyebrow / spec-label treatment that carries most of the "instrument"
-   feel. Opt-in rather than bound to h6: h6 is a generic heading level merchants
-   use anywhere, and forcing a face on it would override the Typography setting
-   with no way to undo it from the editor. Add `class="mono-label"` to a custom
-   Liquid block, or wrap text in <span class="mono-label"> in a rich-text block.
+   Add these as a class on a text block, or wrap words inside a rich-text block,
+   to reach the typographic accents the reference uses that no theme setting
+   exposes.
    -------------------------------------------------------------------------- */
 
-.mono-label {
-  font-family: var(--font-mono);
-  font-feature-settings: 'tnum' 1;
-  letter-spacing: 0.08em;
+/* The italic serif words in the running marquee. */
+.serif-accent,
+.serif-accent em {
+  font-family: var(--font-serif);
+  font-style: italic;
+  font-weight: 400;
+  letter-spacing: -0.01em;
+}
+
+/* The marquee's emphasised words carry the serif accent from the reference
+   ("New store in New York"). Targeted on the marquee itself because a rich-text
+   block strips a class attribute, so <em> is the only hook available there. */
+.marquee__content em {
+  font-family: var(--font-serif);
+  font-style: italic;
+  font-weight: 400;
+  letter-spacing: -0.01em;
+}
+
+/* The small uppercase eyebrow above section headings ("SHOP BY CATEGORY"). */
+.eyebrow {
+  color: var(--sage-600);
+  font-family: var(--font-subheading--family);
+  font-size: var(--font-size--2xs);
+  font-weight: 500;
+  letter-spacing: 0.14em;
   text-transform: uppercase;
 }
 
-/* Badges: a small, hard, precise chip rather than a soft pill.
+/* Tinted grounds. Usable from a section's Custom CSS field in the editor. */
+.bg-sage {
+  background-color: var(--sage-100);
+}
 
-   product-badges-styles.liquid declares font-family and font-size on
-   `.product-badges__badge` from a {% stylesheet %} block, which Shopify serves
-   after this file. Setting the variables it reads — rather than the properties
-   themselves — means this holds regardless of which sheet lands last. */
+.bg-sage-soft {
+  background-color: var(--sage-50);
+}
+
+.bg-cream {
+  background-color: var(--cream-100);
+}
+
+.bg-clay {
+  background-color: var(--clay-100);
+}
+
+.bg-sky {
+  background-color: var(--sky-100);
+}
+
+/* Circular category tiles — the icon row under the hero. */
+.circle-tile {
+  align-items: center;
+  aspect-ratio: 1;
+  background-color: var(--sage-50);
+  border-radius: 50%;
+  display: flex;
+  justify-content: center;
+  transition: background-color var(--hover-transition-duration) var(--hover-transition-timing);
+}
+
+.circle-tile:hover {
+  background-color: var(--sage-200);
+}
+
+/* ----------------------------------------------------------------------------
+   4. Product & collection cards
+
+   The reference card is: tinted media ground, hairline, rounded corners, and a
+   lift that gains depth rather than just sliding.
+   -------------------------------------------------------------------------- */
+
+/* The radius stays on the block's own --border-radius (Horizon applies it via
+   .border-style) so the merchant's per-block corner setting still wins, and
+   box-shadow follows it for free. */
+.product-card .card-gallery,
+.collection-card__inner {
+  background-color: var(--media-ground);
+  box-shadow: 0 0 0 1px var(--hairline);
+  transition: box-shadow var(--hover-transition-duration) var(--hover-transition-timing);
+}
+
+@media (any-pointer: fine) and (prefers-reduced-motion: no-preference) {
+  .card-hover-effect-lift .product-card:hover .card-gallery,
+  .card-hover-effect-lift .collection-card:hover .collection-card__inner {
+    box-shadow: var(--shadow-card-hover), 0 0 0 1px var(--hairline-strong);
+  }
+}
+
+/* Badges: a small, flat chip. product-badges-styles.liquid declares font-family
+   and font-size on `.product-badges__badge` from a {% stylesheet %} block, which
+   Shopify serves after this file — so set the variables it reads rather than the
+   properties themselves, and this holds whichever sheet lands last. */
 .product-badges .product-badges__badge {
-  --badge-font-family: var(--font-mono);
   --badge-font-size: var(--font-size--3xs);
 
-  letter-spacing: 0.08em;
+  letter-spacing: 0.06em;
   line-height: 1;
 }
 
 /* ----------------------------------------------------------------------------
-   4. Header
+   5. Header
 
    Horizon paints the header background on .header__underlay-closed. When the
    header is stuck (header.js sets data-sticky-state="active" on
@@ -158,37 +223,13 @@ html,
 @supports ((backdrop-filter: blur(1px)) or (-webkit-backdrop-filter: blur(1px))) {
   #header-component[data-sticky-state='active'] .header__underlay-closed {
     background: linear-gradient(
-      color-mix(in srgb, var(--color-background-top-row) 65%, transparent) 0 var(--top-row-height),
-      color-mix(in srgb, var(--color-background-bottom-row) 65%, transparent) var(--top-row-height)
+      color-mix(in srgb, var(--color-background-top-row) 78%, transparent) 0 var(--top-row-height),
+      color-mix(in srgb, var(--color-background-bottom-row) 78%, transparent) var(--top-row-height)
         var(--header-height)
     );
-    -webkit-backdrop-filter: blur(24px) saturate(150%);
-    backdrop-filter: blur(24px) saturate(150%);
+    -webkit-backdrop-filter: blur(20px) saturate(140%);
+    backdrop-filter: blur(20px) saturate(140%);
     border-bottom: 1px solid var(--hairline);
-  }
-}
-
-/* ----------------------------------------------------------------------------
-   5. Cards
-
-   Horizon's lift effect only translates the card. On a dark ground a card that
-   moves without gaining depth looks like it slid rather than rose, so the lift
-   is paired with a shadow and a brightening hairline.
-   -------------------------------------------------------------------------- */
-
-/* Only the edge treatment is set here. The radius stays on the block's own
-   --border-radius (Horizon applies it via .border-style) so the merchant's
-   per-block corner setting still wins, and box-shadow follows it for free. */
-.product-card .card-gallery,
-.collection-card__inner {
-  box-shadow: 0 0 0 1px var(--hairline);
-  transition: box-shadow var(--hover-transition-duration) var(--hover-transition-timing);
-}
-
-@media (any-pointer: fine) and (prefers-reduced-motion: no-preference) {
-  .card-hover-effect-lift .product-card:hover .card-gallery,
-  .card-hover-effect-lift .collection-card:hover .collection-card__inner {
-    box-shadow: var(--shadow-card-hover), 0 0 0 1px var(--hairline-strong);
   }
 }
 
@@ -205,35 +246,23 @@ html,
   }
 }
 
-/* A soft ring outside the border so focus is visible without relying on the
-   border colour alone. Matches base.css's `.field__input:focus` selector so it
-   extends that rule rather than losing to it on specificity. */
+/* A soft ring outside the border on focus. Matches base.css's
+   `.field__input:focus` selector so it extends that rule rather than losing to
+   it on specificity. */
 .field__input:focus {
-  box-shadow: var(--input-box-shadow-focus), 0 0 0 4px rgb(var(--color-foreground-rgb) / 0.08);
+  box-shadow: var(--input-box-shadow-focus), 0 0 0 4px rgb(109 138 74 / 0.16);
 }
 
-/* Placeholder text at the stock opacity is nearly invisible on dark. */
 ::placeholder {
   color: rgb(var(--color-input-text-rgb) / 0.45);
 }
-
-/* ----------------------------------------------------------------------------
-   7. Surfaces
-
-   Drawers, dialogs and popovers get the elevation ladder and a hairline. The
-   colours themselves come from settings; this only adds the edge treatment
-   that settings has no field for.
-   -------------------------------------------------------------------------- */
 
 dialog {
   box-shadow: var(--shadow-popover);
 }
 
 /* ----------------------------------------------------------------------------
-   8. Motion safety
-
-   Every motion rule above is already gated on prefers-reduced-motion, but
-   Horizon's own view transitions and page transitions are not.
+   7. Motion safety
    -------------------------------------------------------------------------- */
 
 @media (prefers-reduced-motion: reduce) {
@@ -251,7 +280,7 @@ dialog {
 }
 
 /* ----------------------------------------------------------------------------
-   9. Demo placeholder photography
+   8. Demo placeholder photography
 
    Shopify renders a grey outline SVG wherever a product, collection, article or
    section block has no media yet (`placeholder_svg_tag`). This paints real
