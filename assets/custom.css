@@ -1,0 +1,251 @@
+/* ============================================================================
+   custom.css — "Precision" dark design layer
+   ----------------------------------------------------------------------------
+   Loaded after color-palette.liquid so it can override the theme's token layer.
+   No Horizon file is modified beyond the one render line that loads this, so
+   theme updates continue to apply cleanly.
+
+   Colour, type, radii and button styling live in theme settings (Theme editor →
+   Settings). This file covers what settings can't reach: the elevation ladder,
+   dark-specific contrast fixes, motion, and a handful of component refinements.
+   ========================================================================== */
+
+/* ----------------------------------------------------------------------------
+   1. Tokens
+   -------------------------------------------------------------------------- */
+
+:root {
+  /* Elevation ladder. The page ground is #0A0A0B. Each step up adds light
+     rather than a shadow — on a near-black ground a shadow reads as mud, so
+     depth has to come from the surface getting brighter. */
+  --surface-1: #101014; /* cards, inputs, popovers */
+  --surface-2: #17171d; /* hover / active state of the above */
+  --surface-3: #1e1e25; /* pressed, or a third nested level */
+
+  /* Hairlines are the foreground at low alpha, not a fixed grey, so they stay
+     correct if the ground colour is ever retuned in settings. */
+  --hairline: rgb(var(--color-foreground-rgb) / 0.1);
+  --hairline-strong: rgb(var(--color-foreground-rgb) / 0.18);
+
+  /* Monospace label face. System stack — zero bytes, paints immediately, and
+     every target platform ships a good one. */
+  --font-mono: ui-monospace, SFMono-Regular, 'SF Mono', 'Roboto Mono', Menlo, Consolas, monospace;
+
+  /* Radii: mechanical rather than pillowy. Horizon's sm/md/lg are used by
+     drawers, menus and media wrappers that settings don't expose. */
+  --style-border-radius-xs: 4px;
+  --style-border-radius-sm: 8px;
+  --style-border-radius-md: 10px;
+  --style-border-radius-lg: 14px;
+
+  /* Shadows: deep, wide and low-opacity, always paired with a hairline so the
+     edge stays legible where the shadow alone can't carry it. */
+  --shadow-button: 0 1px 2px rgb(0 0 0 / 0.5);
+  --shadow-popover: 0 20px 48px -16px rgb(0 0 0 / 0.8), 0 0 0 1px var(--hairline);
+  --shadow-drawer: 0 24px 64px -20px rgb(0 0 0 / 0.85);
+  --shadow-card-hover: 0 20px 44px -20px rgb(0 0 0 / 0.9);
+
+  /* theme-styles-variables.liquid and base.css both set
+     `--backdrop-color-rgb: var(--color-shadow-rgb)`, but --color-shadow-rgb is
+     never defined anywhere in the theme. That leaves the dialog and drawer
+     backdrops resolving to an invalid colour, so they render fully transparent.
+     Defining it here restores the scrim behind modals and the cart drawer. */
+  --color-shadow-rgb: 0 0 0;
+
+  /* Motion: fewer moves, slower, more deliberate. Horizon's 0.125s default
+     reads as snap on white and as flicker on dark. */
+  --hover-transition-duration: 0.3s;
+  --hover-transition-timing: cubic-bezier(0.22, 1, 0.36, 1);
+  --animation-speed: 0.18s;
+  --animation-speed-medium: 0.22s;
+  --animation-speed-slow: 0.3s;
+
+  /* Card lift travels a little further to match the slower easing. */
+  --hover-lift-amount: 6px;
+
+  /* Status colours. Horizon ships --color-error #8B0000 and --color-success
+     #006400, both of which are effectively invisible on a near-black ground. */
+  --color-error: #ff7070;
+  --color-success: #4ade80;
+  --color-instock: #4ade80;
+  --color-lowstock: #fbbf24;
+  --color-outofstock: #5c5c66;
+
+  /* Focus ring. The 1.5px default disappears against dark; 2px at a wider
+     offset stays obvious without looking like a border. */
+  --focus-outline-width: 2px;
+  --focus-outline-offset: 3px;
+
+  /* Badge chip padding, flattened across breakpoints — the stock values step up
+     at 750px, which makes a 12px mono label look loose on desktop. */
+  --badge-rectangle-padding-block: 3px;
+  --badge-rectangle-padding-inline: 8px;
+
+  /* Media overlay. Product photography is usually lighter than the page, so
+     white type over it needs a heavier foot than the stock 0.5 ramp. */
+  --gradient-image-overlay: linear-gradient(to top, rgb(0 0 0 / 0.75), rgb(0 0 0 / 0.2) 45%, transparent);
+}
+
+/* ----------------------------------------------------------------------------
+   2. Base
+   -------------------------------------------------------------------------- */
+
+/* Subpixel antialiasing thickens light-on-dark text and gives it a coloured
+   fringe. Greyscale AA is the single biggest legibility win on a dark theme. */
+body {
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+/* Digits in prices sit in fixed-width columns so grids don't jitter as values
+   change and totals line up in the cart. */
+.price,
+.compare-at-price {
+  font-variant-numeric: tabular-nums;
+}
+
+::selection {
+  background-color: var(--color-foreground);
+  color: var(--color-background);
+}
+
+html,
+.page-wrapper {
+  scrollbar-color: rgb(var(--color-foreground-rgb) / 0.22) transparent;
+}
+
+/* ----------------------------------------------------------------------------
+   3. Mono label utility
+
+   The eyebrow / spec-label treatment that carries most of the "instrument"
+   feel. Opt-in rather than bound to h6: h6 is a generic heading level merchants
+   use anywhere, and forcing a face on it would override the Typography setting
+   with no way to undo it from the editor. Add `class="mono-label"` to a custom
+   Liquid block, or wrap text in <span class="mono-label"> in a rich-text block.
+   -------------------------------------------------------------------------- */
+
+.mono-label {
+  font-family: var(--font-mono);
+  font-feature-settings: 'tnum' 1;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+/* Badges: a small, hard, precise chip rather than a soft pill.
+
+   product-badges-styles.liquid declares font-family and font-size on
+   `.product-badges__badge` from a {% stylesheet %} block, which Shopify serves
+   after this file. Setting the variables it reads — rather than the properties
+   themselves — means this holds regardless of which sheet lands last. */
+.product-badges .product-badges__badge {
+  --badge-font-family: var(--font-mono);
+  --badge-font-size: var(--font-size--3xs);
+
+  letter-spacing: 0.08em;
+  line-height: 1;
+}
+
+/* ----------------------------------------------------------------------------
+   4. Header
+
+   Horizon paints the header background on .header__underlay-closed. When the
+   header is stuck (header.js sets data-sticky-state="active" on
+   #header-component) the underlay goes translucent and blurs what passes under
+   it. color-mix keeps whatever background colour the merchant picked per row
+   instead of hardcoding the palette.
+   -------------------------------------------------------------------------- */
+
+@supports ((backdrop-filter: blur(1px)) or (-webkit-backdrop-filter: blur(1px))) {
+  #header-component[data-sticky-state='active'] .header__underlay-closed {
+    background: linear-gradient(
+      color-mix(in srgb, var(--color-background-top-row) 65%, transparent) 0 var(--top-row-height),
+      color-mix(in srgb, var(--color-background-bottom-row) 65%, transparent) var(--top-row-height)
+        var(--header-height)
+    );
+    -webkit-backdrop-filter: blur(24px) saturate(150%);
+    backdrop-filter: blur(24px) saturate(150%);
+    border-bottom: 1px solid var(--hairline);
+  }
+}
+
+/* ----------------------------------------------------------------------------
+   5. Cards
+
+   Horizon's lift effect only translates the card. On a dark ground a card that
+   moves without gaining depth looks like it slid rather than rose, so the lift
+   is paired with a shadow and a brightening hairline.
+   -------------------------------------------------------------------------- */
+
+/* Only the edge treatment is set here. The radius stays on the block's own
+   --border-radius (Horizon applies it via .border-style) so the merchant's
+   per-block corner setting still wins, and box-shadow follows it for free. */
+.product-card .card-gallery,
+.collection-card__inner {
+  box-shadow: 0 0 0 1px var(--hairline);
+  transition: box-shadow var(--hover-transition-duration) var(--hover-transition-timing);
+}
+
+@media (any-pointer: fine) and (prefers-reduced-motion: no-preference) {
+  .card-hover-effect-lift .product-card:hover .card-gallery,
+  .card-hover-effect-lift .collection-card:hover .collection-card__inner {
+    box-shadow: var(--shadow-card-hover), 0 0 0 1px var(--hairline-strong);
+  }
+}
+
+/* ----------------------------------------------------------------------------
+   6. Controls
+   -------------------------------------------------------------------------- */
+
+/* A 1px press. Enough to register as a physical button, small enough that it
+   never reads as a layout shift. */
+@media (prefers-reduced-motion: no-preference) {
+  .button:active:not([aria-disabled='true'], :disabled),
+  .button-secondary:active:not([aria-disabled='true'], :disabled) {
+    transform: translateY(1px);
+  }
+}
+
+/* A soft ring outside the border so focus is visible without relying on the
+   border colour alone. Matches base.css's `.field__input:focus` selector so it
+   extends that rule rather than losing to it on specificity. */
+.field__input:focus {
+  box-shadow: var(--input-box-shadow-focus), 0 0 0 4px rgb(var(--color-foreground-rgb) / 0.08);
+}
+
+/* Placeholder text at the stock opacity is nearly invisible on dark. */
+::placeholder {
+  color: rgb(var(--color-input-text-rgb) / 0.45);
+}
+
+/* ----------------------------------------------------------------------------
+   7. Surfaces
+
+   Drawers, dialogs and popovers get the elevation ladder and a hairline. The
+   colours themselves come from settings; this only adds the edge treatment
+   that settings has no field for.
+   -------------------------------------------------------------------------- */
+
+dialog {
+  box-shadow: var(--shadow-popover);
+}
+
+/* ----------------------------------------------------------------------------
+   8. Motion safety
+
+   Every motion rule above is already gated on prefers-reduced-motion, but
+   Horizon's own view transitions and page transitions are not.
+   -------------------------------------------------------------------------- */
+
+@media (prefers-reduced-motion: reduce) {
+  :root {
+    --hover-transition-duration: 0.01ms;
+    --animation-speed: 0.01ms;
+    --animation-speed-medium: 0.01ms;
+    --animation-speed-slow: 0.01ms;
+    --hover-lift-amount: 0px;
+  }
+
+  html {
+    scroll-behavior: auto;
+  }
+}

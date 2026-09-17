@@ -1,0 +1,13 @@
+{%- doc -%}
+  Loads the custom design layer.
+
+  Must be rendered after 'theme-styles-variables' and 'color-palette', which
+  emit their tokens from inline {% style %} blocks. Those blocks sit later in
+  the document than a <link> from 'stylesheets', so a token redefined in
+  custom.css only wins if custom.css is linked after them.
+
+  @example
+  {%- render 'custom-styles' -%}
+{%- enddoc -%}
+
+{{ 'custom.css' | asset_url | stylesheet_tag }}
