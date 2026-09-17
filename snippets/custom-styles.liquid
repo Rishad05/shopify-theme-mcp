@@ -1,13 +1,50 @@
 {%- doc -%}
-  Loads the custom design layer.
+  Loads the custom design layer, plus the demo placeholder image map.
 
   Must be rendered after 'theme-styles-variables' and 'color-palette', which
   emit their tokens from inline {% style %} blocks. Those blocks sit later in
   the document than a <link> from 'stylesheets', so a token redefined in
   custom.css only wins if custom.css is linked after them.
 
+  The placeholder URLs are passed to CSS as custom properties rather than being
+  written into custom.css directly: a plain .css asset can't call asset_url, and
+  hardcoding a relative path would assume custom.css and the images are always
+  served from the same CDN directory.
+
   @example
   {%- render 'custom-styles' -%}
 {%- enddoc -%}
+
+{% style %}
+  :root {
+    /* Demo placeholder photography (Unsplash licence — free to use, attribution
+       not required). These are only ever painted onto Shopify's placeholder
+       SVGs, which disappear on their own the moment a product, collection or
+       section has real media — so nothing here reaches a storefront that has its
+       own images.
+
+       To swap one, drop a replacement over the file in assets/ and keep the
+       name. Sources (unsplash.com/photos/<id>):
+
+         product-1     1521572163474-6864f9cf17ab   detail-1     1556905055-8f358a7a47b2
+         product-2     1434389677669-e08b4cac3105   detail-2     1479064555552-3ef4979f8908
+         product-3     1591047139829-d91aecb6caea   hero-1       1544022613-e87ca75a784a
+         collection-1  1523381210434-271e8be1f52b   hero-2       1489987707025-afc232f7ea0f
+         collection-2  1490481651871-ab68de25d43d   hero-3       1445205170230-053b83016050
+         collection-3  1512436991641-6745cdb1723f   blog-1       1490578474895-699cd4e2cf59 */
+    --placeholder-product-1: url({{ 'placeholder-product-1.jpg' | asset_url }});
+    --placeholder-product-2: url({{ 'placeholder-product-2.jpg' | asset_url }});
+    --placeholder-product-3: url({{ 'placeholder-product-3.jpg' | asset_url }});
+    --placeholder-collection-1: url({{ 'placeholder-collection-1.jpg' | asset_url }});
+    --placeholder-collection-2: url({{ 'placeholder-collection-2.jpg' | asset_url }});
+    --placeholder-collection-3: url({{ 'placeholder-collection-3.jpg' | asset_url }});
+    --placeholder-hero-1: url({{ 'placeholder-hero-1.jpg' | asset_url }});
+    --placeholder-hero-2: url({{ 'placeholder-hero-2.jpg' | asset_url }});
+    --placeholder-hero-3: url({{ 'placeholder-hero-3.jpg' | asset_url }});
+    --placeholder-detail-1: url({{ 'placeholder-detail-1.jpg' | asset_url }});
+    --placeholder-detail-2: url({{ 'placeholder-detail-2.jpg' | asset_url }});
+    --placeholder-blog-1: url({{ 'placeholder-blog-1.jpg' | asset_url }});
+  }
+{% endstyle %}
 
 {{ 'custom.css' | asset_url | stylesheet_tag }}

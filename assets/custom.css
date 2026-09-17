@@ -249,3 +249,144 @@ dialog {
     scroll-behavior: auto;
   }
 }
+
+/* ----------------------------------------------------------------------------
+   9. Demo placeholder photography
+
+   Shopify renders a grey outline SVG wherever a product, collection, article or
+   section block has no media yet (`placeholder_svg_tag`). This paints real
+   apparel photography onto those SVGs so an unpopulated store previews as a
+   finished one.
+
+   Nothing here touches real media. The moment a product gets an image Shopify
+   stops emitting the placeholder SVG entirely, so these rules go inert on their
+   own — there is no cleanup step before going live.
+
+   Two constraints shape the selectors below:
+
+   1. `placeholder_svg_tag`'s class argument REPLACES the default
+      `placeholder-svg` class rather than appending to it. So each call site has
+      to be matched by whatever class it was given, and only a bare call
+      (card-gallery, collection-card, background-media) keeps `placeholder-svg`.
+
+   2. Several of those classes — hero__media, slide__image,
+      layered-slideshow__image, hotspots__background-image — are also on the
+      real <img> for the same block. Every selector is therefore qualified with
+      `svg`, so a merchant's own photography is never painted over.
+   -------------------------------------------------------------------------- */
+
+:is(
+  svg.placeholder-svg,
+  svg.hero__media,
+  svg.slide__image,
+  svg.layered-slideshow__image,
+  svg.hotspots__background-image,
+  svg.blog-placeholder-svg,
+  svg.media-block__placeholder,
+  svg.image-block__placeholder,
+  svg.product-media-gallery__placeholder-image,
+  svg.hotspot-dialog__placeholder-product-image
+) {
+  background-color: var(--surface-1);
+  background-image: var(--placeholder-image, var(--placeholder-hero-3));
+  background-position: center;
+  background-repeat: no-repeat;
+  background-size: cover;
+}
+
+/* Hide the stock grey artwork sitting under the photograph. `visibility` rather
+   than `display` so the SVG keeps the intrinsic size the theme sizes against. */
+:is(
+  svg.placeholder-svg,
+  svg.hero__media,
+  svg.slide__image,
+  svg.layered-slideshow__image,
+  svg.hotspots__background-image,
+  svg.blog-placeholder-svg,
+  svg.media-block__placeholder,
+  svg.image-block__placeholder,
+  svg.product-media-gallery__placeholder-image,
+  svg.hotspot-dialog__placeholder-product-image
+) > * {
+  visibility: hidden;
+}
+
+/* --- Per-surface assignment ------------------------------------------------ */
+
+svg.hero__media {
+  --placeholder-image: var(--placeholder-hero-1);
+}
+
+svg.slide__image,
+svg.layered-slideshow__image {
+  --placeholder-image: var(--placeholder-hero-2);
+}
+
+svg.hotspots__background-image {
+  --placeholder-image: var(--placeholder-hero-3);
+}
+
+svg.product-media-gallery__placeholder-image {
+  --placeholder-image: var(--placeholder-product-1);
+}
+
+svg.hotspot-dialog__placeholder-product-image {
+  --placeholder-image: var(--placeholder-product-2);
+}
+
+svg.media-block__placeholder {
+  --placeholder-image: var(--placeholder-detail-1);
+}
+
+svg.image-block__placeholder {
+  --placeholder-image: var(--placeholder-detail-2);
+}
+
+svg.blog-placeholder-svg {
+  --placeholder-image: var(--placeholder-blog-1);
+}
+
+/* --- Product cards ---------------------------------------------------------
+
+   card-gallery.liquid already cycles through product-apparel-1/2/3 by block
+   index, but every variant renders with the same class, so CSS can't tell them
+   apart. Cycling on the grid item's position reproduces the same variety. */
+
+.card-gallery__placeholder svg {
+  --placeholder-image: var(--placeholder-product-1);
+}
+
+.product-grid__item:nth-of-type(3n + 2) .card-gallery__placeholder svg {
+  --placeholder-image: var(--placeholder-product-2);
+}
+
+.product-grid__item:nth-of-type(3n + 3) .card-gallery__placeholder svg {
+  --placeholder-image: var(--placeholder-product-3);
+}
+
+/* --- Collection cards ------------------------------------------------------ */
+
+.collection-card svg.placeholder-svg {
+  --placeholder-image: var(--placeholder-collection-1);
+}
+
+.resource-list__item:nth-of-type(3n + 2) .collection-card svg.placeholder-svg {
+  --placeholder-image: var(--placeholder-collection-2);
+}
+
+.resource-list__item:nth-of-type(3n + 3) .collection-card svg.placeholder-svg {
+  --placeholder-image: var(--placeholder-collection-3);
+}
+
+/* --- Comparison slider -----------------------------------------------------
+
+   Both halves call placeholder_svg_tag bare, so without this they'd resolve to
+   the same default image and the slider would compare a photo to itself. */
+
+.comparison-slider__placeholder.before-image svg.placeholder-svg {
+  --placeholder-image: var(--placeholder-product-1);
+}
+
+.comparison-slider__placeholder.after-image svg.placeholder-svg {
+  --placeholder-image: var(--placeholder-product-3);
+}
